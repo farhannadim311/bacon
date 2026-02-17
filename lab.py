@@ -17,6 +17,7 @@ import pickle
 def transform_data(raw_data):
     film_graph = {}
     actor_graph = {}
+    ult_graph = {}
     for a1,a2,f in raw_data:
         if(f in film_graph):
             film_graph[f].add(a1)
@@ -27,20 +28,31 @@ def transform_data(raw_data):
             film_graph[f].add(a2)
         if(a1 in actor_graph):
             actor_graph[a1].add(a2)
+            ult_graph[a1].add((a2,f))
         if(a2 in actor_graph):
-            actor_graph[a2].add(a1)
-        
+            actor_graph[a2].add(a1)  
+            ult_graph[a2].add((a1,f))
         if(a1 not in actor_graph):
             actor_graph[a1] = set()
+            ult_graph[a1] = set()
         if(a2 not in actor_graph):
             actor_graph[a2] = set()
+            ult_graph[a2] = set()
         actor_graph[a1].add(a2)
         actor_graph[a2].add(a1)
+        ult_graph[a1].add((a2,f))
+        ult_graph[a2].add((a1,f))
     for film, actors in film_graph.items():
         for actor in actors:
             actor_graph[actor].update(actors)
             actor_graph[actor].discard(actor)
-    return (film_graph, actor_graph)
+    for film, actors in film_graph.items():
+        lst = list(actors)
+        for actor in lst:
+            for i in range(len(lst)):
+                if(lst[i] != actor):
+                    ult_graph[actor].add((lst[i], film))
+    return (film_graph, actor_graph, ult_graph)
 
 
 
@@ -156,27 +168,46 @@ def actors_connecting_films(transformed_data, film1, film2):
     if(film1 not in film_graph or film2 not in film_graph):
         return None
     actor_set_film = film_graph[film1]
-    test = film_graph[film2]
-    for actors in actor_set_film:
-        visited = {actors}
-        path = [[actors,]]
-        while path:
-            p = path.pop(0)
-            if(p[-1] in film_graph[film2]):
-                return p
+    first = actor_set_film.pop()
+    visited = {first}
+    path = [[first,]]
+
+    while path:
+        p = path.pop(0)
+        if(p[-1] in film_graph[film2]):
+            return p
+        for actors in actor_set_film:
+            if(actors not in visited):
+                visited.add(actors)
+                path.append([actors])
             for actor in p:
                 to_explore = actor_graph[actor]
-            for actor2 in to_explore:
-                exploring = []
-                if(actor2 not in visited):
-                    exploring.append(actor2)
-                    visited.add(actor2)
-                    new = p + exploring
-                    path.append(new)
+                for actor2 in to_explore:
+                    exploring = []
+                    if(actor2 not in visited):
+                        exploring.append(actor2)
+                        visited.add(actor2)
+                        new = p + exploring
+                        path.append(new)
     return None
 
 
-            
+def movie_path(transformed_data, actor1, actor2):
+    ult_graph = transformed_data[2]
+    path = actor_to_actor_path(transformed_data, actor1, actor2)
+    if(path == None):
+        return None
+    res = []
+    for i in range(0, len(path) - 1):
+        actor = path[i]
+        nex = path[i + 1]
+        actor_set = ult_graph[actor]
+        for a, film in actor_set:
+            if(a == nex):
+                res.append(film)
+                break
+    return res
+
 
 
 
@@ -191,7 +222,7 @@ if __name__ == "__main__":
     with open('resources/names.pickle', 'rb') as f:
         names = pickle.load(f)
     t = transform_data(largedb)
-    print(actors_connecting_films(t, 18860, 75181))
+    print(actors_connecting_films(t, 177361, 177361))
     
     
     
