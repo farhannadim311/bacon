@@ -151,7 +151,34 @@ def actor_path(transformed_data, actor_id_1, goal_test_function):
 
 
 def actors_connecting_films(transformed_data, film1, film2):
-    raise NotImplementedError("Implement me!")
+    actor_graph = transformed_data[1]
+    film_graph = transformed_data[0]
+    if(film1 not in film_graph or film2 not in film_graph):
+        return None
+    actor_set_film = film_graph[film1]
+    test = film_graph[film2]
+    for actors in actor_set_film:
+        visited = {actors}
+        path = [[actors,]]
+        while path:
+            p = path.pop(0)
+            if(p[-1] in film_graph[film2]):
+                return p
+            for actor in p:
+                to_explore = actor_graph[actor]
+            for actor2 in to_explore:
+                exploring = []
+                if(actor2 not in visited):
+                    exploring.append(actor2)
+                    visited.add(actor2)
+                    new = p + exploring
+                    path.append(new)
+    return None
+
+
+            
+
+
 
 
 if __name__ == "__main__":
@@ -163,18 +190,9 @@ if __name__ == "__main__":
         largedb = pickle.load(f)
     with open('resources/names.pickle', 'rb') as f:
         names = pickle.load(f)
-    t = transform_data(tinydb)
-    actor_graph = t[1]
-    print(actor_graph)
-    #bacon_path(t, 2876669)
-    pete_id = names["Pete Ludlow"]
-    path = bacon_path(t, pete_id)
-    for i in path:
-        for key, val in names.items():
-            if val == i:
-                print(key)
-    pass
-
+    t = transform_data(largedb)
+    print(actors_connecting_films(t, 18860, 75181))
+    
     
     
     #transformed_data = transform_data(largedb)

@@ -388,7 +388,11 @@ def test_actor_to_actor_path_additional(test_num):
 
 
 def test_tiny_actor_path():
-    assert False
+    result = lab.actor_path(db_tiny, 2876, lambda p: p in {4724, 1640, 1532})
+    expected = [[2876, 4724], [2876, 1640], [2876, 1532]]
+    assert result in expected
+    result = lab.actor_path(db_tiny, 2876, lambda p : False)
+    assert result is None
 
 
 def test_actor_path_01():
