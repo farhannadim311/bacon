@@ -57,19 +57,97 @@ def acted_together(transformed_data, actor_id_1, actor_id_2):
 
 
 def actors_with_bacon_number(transformed_data, num):
-    raise NotImplementedError("Implement me!")
+    if(len(transformed_data) == 0):
+        return set()
+    actor_graph = transformed_data[1]
+    bacon = [{4724}]
+    visited = {4724}
+    i = 0
+    if(num == 0):
+        return bacon[-1]
+    else:
+        while(bacon):
+            actor_set = bacon.pop(0)
+            newSet = set()
+            if(i == num):
+                return actor_set
+            for actor1 in actor_set:
+                to_explore = actor_graph[actor1]
+                for actor2 in to_explore:
+                    if(actor2 not in visited):
+                        newSet.add(actor2)
+                        visited.add(actor2)
+            if(len(newSet) == 0):
+                return newSet
+            bacon.append(newSet)
+            i += 1
+    return newSet
 
 
 def bacon_path(transformed_data, actor_id):
-    raise NotImplementedError("Implement me!")
+    actor_graph = transformed_data[1]
+    visited = {4724}
+    path = [[4724,]]
+    while(path):
+        p = path.pop(0)
+        if(p[-1] == actor_id):
+            return p
+        for actor in p:
+            to_explore = actor_graph[actor]
+            for actor2 in to_explore:
+                exploring = []
+                if(actor2 not in visited):
+                    exploring.append(actor2)
+                    visited.add(actor2)
+                    new = p + exploring
+                    path.append(new)
+    return None
+
+
+    
+
 
 
 def actor_to_actor_path(transformed_data, actor_id_1, actor_id_2):
-    raise NotImplementedError("Implement me!")
+    actor_graph = transformed_data[1]
+    visited = {actor_id_1}
+    path = [[actor_id_1,]]
+    while(path):
+        p = path.pop(0)
+        if(p[-1] == actor_id_2):
+            return p
+        for actor in p:
+            to_explore = actor_graph[actor]
+            for actor2 in to_explore:
+                exploring = []
+                if(actor2 not in visited):
+                    exploring.append(actor2)
+                    visited.add(actor2)
+                    new = p + exploring
+                    path.append(new)
+    return None
+    
 
 
 def actor_path(transformed_data, actor_id_1, goal_test_function):
-    raise NotImplementedError("Implement me!")
+    actor_graph = transformed_data[1]
+    visited = {actor_id_1}
+    path = [[actor_id_1,]]
+    while(path):
+        p = path.pop(0)
+        if(goal_test_function(p[-1])):
+            return p
+        for actor in p:
+            to_explore = actor_graph[actor]
+            for actor2 in to_explore:
+                exploring = []
+                if(actor2 not in visited):
+                    exploring.append(actor2)
+                    visited.add(actor2)
+                    new = p + exploring
+                    path.append(new)
+    return None
+    
 
 
 def actors_connecting_films(transformed_data, film1, film2):
@@ -77,16 +155,48 @@ def actors_connecting_films(transformed_data, film1, film2):
 
 
 if __name__ == "__main__":
+    with open("resources/small.pickle", 'rb') as f:
+        smalldb = pickle.load(f)
     with open("resources/tiny.pickle", 'rb') as f:
         tinydb = pickle.load(f)
-    transform = transform_data(tinydb)
-    actor_graph = transform[1]
-    print(actor_graph[4724])
-    print(f"{actor_graph[1640] =}")
-    print(f"{actor_graph[2876] =}")
-    print(f"{actor_graph[1532] =}")
+    with open("resources/large.pickle", 'rb') as f:
+        largedb = pickle.load(f)
+    with open('resources/names.pickle', 'rb') as f:
+        names = pickle.load(f)
+    t = transform_data(tinydb)
+    actor_graph = t[1]
+    print(actor_graph)
+    #bacon_path(t, 2876669)
+    pete_id = names["Pete Ludlow"]
+    path = bacon_path(t, pete_id)
+    for i in path:
+        for key, val in names.items():
+            if val == i:
+                print(key)
+    pass
+
+    
+    
+    #transformed_data = transform_data(largedb)
+    #s = actors_with_bacon_number(transformed_data, 6)
+    #print(s)
+    #for key,val in names.items():
+        #if(val in s):
+            #print(key)
+    #for actor in actor_graph[4724]:
+        #print(f"{actor_graph[actor]=}")
+    #bacon = actors_with_bacon_number(transformed_data, 10**20)
+    #print(bacon)
+        
+    #print(actor_graph[4724])
+    #print(f"{actor_graph[1640] =}")
+    #rint(f"{actor_graph[2876] =}")
+    ##print(f"{actor_graph[1532] =}")
+    #bacon = actors_with_bacon_number(transform, 2)
+    #print(bacon)
    #with open('resources/small.pickle', 'rb') as f:
     #raw_data = pickle.load(f)
+    
 
 # 2. Load the names to find the IDs
     #with open('resources/names.pickle', 'rb') as f:

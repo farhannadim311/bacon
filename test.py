@@ -113,7 +113,7 @@ def test_tiny_bacon_number_01():
 
 def test_tiny_bacon_number_02():
      ans = lab.actors_with_bacon_number(db_tiny, 2)
-     expected = {}
+     expected = set()
      assert(ans == expected), f"Incorrect"
 
 
@@ -173,7 +173,9 @@ def test_bacon_number_03():
 
 
 def test_tiny_bacon_path():
-    assert False
+    expected = [4724, 1640]
+    result = lab.bacon_path(db_tiny, 1640)
+    assert expected == result
 
 def test_bacon_path_01():
     # Bacon path, small database, path does not exist
@@ -255,7 +257,11 @@ def test_bacon_path_07():
 
 
 def test_tiny_actor_to_actor_path():
-    assert False
+    actor_1 = 2876
+    actor_2 = 1640
+    result = [2876, 1640]
+    ans = lab.actor_to_actor_path(db_tiny, actor_1, actor_2)
+    assert(result == ans)
 
 
 def test_actor_to_actor_path_01():
